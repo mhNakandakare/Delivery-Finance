@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  INVESTOR
+  OWNER
+  ADMIN
+}
+
+enum FundingStatus {
+  OPEN
+  FUNDED
+  CLOSED
+  DEFAULTED
+}
+
+model User {
+  id            String   @id @default(uuid())
+  walletAddress String   @unique
+  email         String?  @unique
+  role          UserRole @default(INVESTOR)
+  createdAt     DateTime @default(now())
+
+  stabs       Stab[]
+  investments Investment[]
+}
+
+model Stab {
+  id             String   @id @default(uuid())
+  ownerId        String
+  name           String
+  cnpj           String   @unique
+  description    String?
+  monthlyRevenue Float
+  score          Float    @default(0)
+  createdAt      DateTime @default(now())
+
+  owner User @relation(fields: [ownerId], references: [id])
+
+  fundingPools FundingPool[]
+}
+
+model FundingPool {
+  id                     String        @id @default(uuid())
+  stabId                 String
+  targetAmount           Float
+  raisedAmount           Float         @default(0)
+  revenueSharePercentage Float
+  durationMonths         Int
+  status                 FundingStatus @default(OPEN)
+  createdAt              DateTime      @default(now())
+
+  stab Stab @relation(fields: [stabId], references: [id])
+
+  investments Investment[]
+}
+
+model Investment {
+  id            String   @id @default(uuid())
+  investorId    String
+  fundingPoolId String
+  amount        Float
+  nftMint       String?
+  createdAt     DateTime @default(now())
+
+  investor User @relation(fields: [investorId], references: [id])
+
+  fundingPool FundingPool @relation(fields: [fundingPoolId], references: [id])
+}
