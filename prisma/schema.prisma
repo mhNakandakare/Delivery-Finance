@@ -73,3 +73,9 @@ model Investment {
 
   fundingPool FundingPool @relation(fields: [fundingPoolId], references: [id])
 }
+model AuthNonce {
+  id            String   @id @default(uuid())
+  walletAddress String   @unique
+  nonce         String
+  createdAt     DateTime @default(now())
+}

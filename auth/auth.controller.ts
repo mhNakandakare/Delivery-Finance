@@ -1,6 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { WalletLoginDto } from './dto/wallet-login.dto';
+import { RequestNonceDto } from './dto/request-nonce.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -8,6 +9,6 @@ export class AuthController {
 
   @Post('login')
   login(@Body() dto: WalletLoginDto) {
-    return this.authService.login(dto.walletAddress);
+    return this.authService.login(dto.walletAddress, dto.signature);
   }
 }
